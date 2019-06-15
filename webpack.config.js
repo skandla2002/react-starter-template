@@ -9,6 +9,7 @@ module.exports = {
     entry: './src/index.js', // 진입 지점(4에서 생략시 src 하위)
     output: {
         filename: 'bundle.[hash].js' // 번들된 파일 이름을 말한다.
+        ,publicPath: '/' // hotloader는 중첩된 경로에서 동작하지 않는다.
     }, // 컴파일된 파일을 저장할 경로를 알려준다.
     devtool: 'inline-source-map', // 애플리케이션 디버깅을 도와준다, 개발시에만 inline-source-map 사용
     module: { // 애플리케이션 내 포함되는 모듈을 정의, ESNext(바벨), CSS 모듈 
@@ -41,6 +42,7 @@ module.exports = {
         ]
     },
     plugins: [
+        new webpack.HotModuleReplacementPlugin(), // HMR 업데이트시 브라우저 터미널에 표시해 알아보기 쉽게 한다.7
         new HtmlWebpackPlugin({
             template: 'public/index.html',
             favicon: 'public/favicon.ico'
@@ -51,5 +53,6 @@ module.exports = {
         port: port, // 기본 3000
         historyApiFallback: true,
         open: true // 브라우저 자동 열림
+        ,hot: true // 서버에 HMR 작동을 허락한다.
     }
 };

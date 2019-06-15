@@ -8,7 +8,7 @@ const Layout = ({ children }) => {
         <Container>
             <Link to="/">
                 <Header as="h1" className= {h1}>
-                    webpack-for-react 
+                    webpack-for-react Hot Loader 11
                 </Header>
             </Link>
             {children}
