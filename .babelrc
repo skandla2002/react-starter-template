@@ -1,6 +1,8 @@
 {
-    "presets": ["@babel/preset-env","@babel/preset-react"],
-    "plugins": ["react-hot-loader/babel"]
+    "presets": ["@babel/preset-env",
+                "@babel/preset-react"],
+    "plugins": [ "@babel/plugin-syntax-dynamic-import",
+                 "react-hot-loader/babel"]
 }
 // 1번째 시도
 // "presets": ["env", "react", "stage-1"]
