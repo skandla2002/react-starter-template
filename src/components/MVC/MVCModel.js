@@ -231,3 +231,71 @@ var Cat = new Class(Animal);
 // 사용법 
 var tommy = new Cat;
 tommy.breath();
+
+// 1.9 함수 호출
+// => 컨텍스트 변경(상태를 공유, 특히 이벤트 콜백에서)
+function.apply(this, [1,2,3]);
+
+function.call(this,1,2,3);
+
+$('.clicky').click(function(){
+    // 'this'는 엘리먼트를 가리킨다.
+    $(this).hide();
+});
+
+$('p').each(function(){
+    // 'this'는 반복하는 항목 가운데 현재 항목을 가리킨다.
+    $(this).remove();
+});
+
+// As-Is
+var clicky = {
+    wasClicked: function(){
+        /*  */
+    },
+    addListeners: function(){
+        var sellf = this;
+        $('.clicky').click(function(){
+            self.wasClicked()
+        });
+    }
+};
+
+clicky.addListeners();
+
+// To-Be
+// apply를 다른 익명 함수내의 콜백을 감싸면 더 깔끔한 코드를 만들 수 있다.
+var proxy = function(func, thisObject){
+    return(function(){
+        return func.apply(thisObject, arguments);
+    });
+};
+
+var clicky = {
+    wasClicked: function(){
+        /*  */
+    },
+
+    addListeners: function(){
+        var self = this;
+        $('.clicky').click(proxy(this.wasClicked, this));
+    }
+};
+
+$('.clicky').click($.proxy(function(){ /* */ },this));
+
+// 위임(델리게이트) 기능
+var App = {
+    log: function(){
+        if(typeof console == 'undefined') return;
+
+        //인자를 적절한 배열로 바꾼다.
+        var args = jQuery.makeArray(arguments);
+
+        //새인자를 추가한다.
+        args.unshift('(App)');
+
+        //console에 위임한다.
+        console.log.apply(console, args);
+    }
+};
