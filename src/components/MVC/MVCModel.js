@@ -299,3 +299,129 @@ var App = {
         console.log.apply(console, args);
     }
 };
+
+// 1.10 클래스 라이브러리에서 범위 조절
+var Class = function(parent){
+    var dlass = function(){
+        this.init.apply(this, arguments);
+    };
+    klass.prototype.init = function(){};
+    klass.fn = klass.prototype;
+
+    // 프록시 함수 추가
+    klass.proxy = function(func){
+        var self = this;
+        return (function(){
+            return func.apply(self, arguments);
+        });
+    }
+
+    // 인스턴스에도 함수를 추가
+    klass.fn.proxy = klass.proxy;
+    return klass;
+};
+
+// proxy() 함수로 범위 정확히 지정 가능
+var Button = new Class;
+Button.include({
+    init: function(elelment){
+        this.element = jQuery(element);
+
+        //클릭 함수를 대신한다.
+        this.element.click(this.proxy(this.click));
+    },
+    click: function(){ /* */}
+});
+
+// click를 callback으로 감싸지 않으면 Button이 아닌 this.element 컨텍스트에서 
+// click()함수가 호출되면서 온갖 문제가 발생한다.
+// ES5에서는 bind 함수로 호출 범위 지정하는 기능 추가
+
+Button.include({
+    init: function(element){
+        this.element = jQuery(element);
+
+        // 클릭 함수를 바인드 한다.
+        this.element.click(this.click.bind(this));
+    },
+    click: function(){ /* */}
+});
+
+// bind shim
+if(!Function.prototype.bind){
+    Function.prototype.bind = function(obj){
+        var slice = [].clice,
+            args = slice.call(arguments, 1),
+            self = this,
+            nop = function(){},
+            bound = function(){
+                return self.apply(this instanceof nop ? this : (obj || {}),
+                args.concat*slice.call(arguments));
+            };
+        nop.prototype = self = prototype;
+        bound.prototype = new nop();
+        return bound;
+    };
+};
+// bound 기능 없을때  Function의 프로토 타입을 덮어쓴다.
+
+// 1.11 비공개 함수 추가하기
+var Person = function(){};
+(function(){
+    var findById = function(){ /* */};
+    Person.find = function(id){
+        if(typeof id == "integer")
+        return findById(id);
+    };
+})();
+
+// 프로퍼티를 익명 함수로 감쌈, Person 변수를 전역 정의했으므로 어디서든 호출 가능
+// 키워드 var 를 사용하면 전역 변수가 되므로 변수를 정의할 때 var은 절대 사용하지 않는다. 
+// 전역 변수를 정의하고 싶다면 전역 영역에서 변수를 선언하거나 윈도우에서 프로퍼티로 선언한다.
+
+(function(exports){
+    var foo = "bar";
+    // 변수 노출
+    exports.foo = foo;
+})(window);
+
+assertEqual(foo, "bar");
+
+//1.12 클래스 라이브러리
+
+var Person = $.Class.create({
+    //생성자
+    initialize: function(name){
+        this.name = name;
+    }
+});
+
+// 클래스 상속하려면 클래스를 생성할때 클래스의 부모를 인자로 전달한다.
+ var Student = $.Class.create(Person, {
+     price: function(){ /* */}
+ });
+
+ var alex = new Student("알렉스");
+ alex.pay();
+
+ /// 클래스에 직접 프로퍼티 추가 가능
+ Person.find = function(id){ /* */};
+ //HJS 사용 가능
+ var alex = new Student("알렉스");
+ var bill = alex.clone();
+
+ assert(alex.equal(bill));
+
+//  <script src="http://maccman.github.com/spne/spine.js"></script>
+//  <script>
+     var Person = Spine.Class.create();
+     Person.extend({
+         find: function(){ /* */}
+     });
+     Person.include({
+         init: function(atts){
+             this.attributes = atts || {};
+         }
+     });
+     var person = Person.init();
+//  </script>
