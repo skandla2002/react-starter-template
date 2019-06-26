@@ -30,6 +30,6 @@ module.exports = env => {
     );
 
     // 웹팩 최종 구성을 반환한다
-    return mergeConfig;
+    return mergeConfig; 
 
 }
